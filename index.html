@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#06070d">
+<title>Photo Heist</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="fx" aria-hidden="true"></canvas>
+<header class="hud">
+  <div class="bar" aria-hidden="true"><i id="pbar"></i></div>
+  <button id="snd" class="ib" aria-pressed="false" aria-label="Toggle sound">🔇</button>
+  <button id="gear" class="ib" aria-label="Settings" aria-expanded="false" aria-controls="menu">⚙️</button>
+  <div id="menu" class="panel" hidden><button id="reset" class="btn ghost">RESET MISSION</button></div>
+</header>
+<main>
+<section class="screen on" id="landing">
+  <div class="lock pulse" aria-hidden="true">🔐</div>
+  <h1 class="title" data-title></h1>
+  <p class="mono">MISSION: ACQUIRE THE CLASSIFIED PHOTOS</p>
+  <dl class="stats panel">
+    <div><dt>TARGET</dt><dd data-her></dd></div>
+    <div><dt>DIFFICULTY</dt><dd id="diff" class="mono"></dd></div>
+    <div><dt>STATUS</dt><dd class="ok mono">MISSION ACCEPTED</dd></div>
+  </dl>
+  <button class="btn" id="start">START MISSION</button>
+</section>
+
+<section class="screen" id="m1">
+  <h2>MISSION 01</h2><p class="mono">PROOF OF POSSESSION</p>
+  <p>Before we continue...<br>We need proof that the classified photos actually exist. 👀</p>
+  <div class="panel">
+    <label class="btn alt" for="file">CHOOSE A PHOTO</label>
+    <input class="sr" type="file" id="file" accept="image/*">
+    <div id="prevwrap" class="prevwrap" hidden><img id="prev" alt="Your selected evidence photo"><div id="scan" class="scan"></div></div>
+    <p id="m1msg" class="msg" role="status" aria-live="polite"></p>
+  </div>
+  <button class="btn" id="m1next" hidden>CONTINUE</button>
+</section>
+
+<section class="screen" id="m2">
+  <h2>MISSION 02</h2><p class="mono">PROVE YOU KNOW YOUR TARGET.</p>
+  <div id="quiz" class="panel">
+    <div class="qtop"><span id="qcount" class="mono"></span><div class="mini"><i id="qbar"></i></div></div>
+    <fieldset><legend id="qtext"></legend><div id="opts"></div></fieldset>
+    <p id="qmsg" class="msg" role="status" aria-live="polite"></p>
+    <button class="btn" id="qsubmit">SUBMIT</button>
+  </div>
+  <div id="qdone" class="panel" hidden>
+    <p class="mono">ACCESS FRAGMENT ACQUIRED</p><p class="frag" id="frag"></p><p id="score" class="mono"></p>
+    <button class="btn" id="m2next">CONTINUE</button>
+  </div>
+</section>
+
+<section class="screen" id="m3">
+  <h2>MISSION 03</h2>
+  <p class="lead">YOU ASKED <span data-me></span> TO PUT IN EFFORT.<br>NOW IT'S YOUR TURN.</p>
+  <p class="mono">COMPLETE THE CHALLENGE.</p>
+  <div id="chbox" class="panel">
+    <span id="chcount" class="mono"></span><h3 id="chtitle"></h3><p id="chtext"></p>
+    <label for="chcode" class="mono">CHALLENGE COMPLETE? ENTER THE CODE YOU RECEIVED:</label>
+    <input id="chcode" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="______">
+    <p id="chmsg" class="msg" role="status" aria-live="polite"></p>
+    <button class="btn" id="chverify">VERIFY</button>
+  </div>
+  <div id="chdone" class="panel" hidden>
+    <p class="mono">ALL CHALLENGES VERIFIED ✅</p><p class="mono">FRAGMENTS</p><p class="frag" id="chfrags"></p>
+    <button class="btn" id="m3next">CONTINUE</button>
+  </div>
+</section>
+
+<section class="screen" id="vault">
+  <div class="vbox"><div class="lock" id="vlock" aria-hidden="true">🔒</div><h2>CLASSIFIED PHOTO VAULT</h2></div>
+  <dl class="stats panel">
+    <div><dt>SECURITY STATUS</dt><dd id="vstatus" class="bad mono">LOCKED</dd></div>
+    <div><dt>PHOTOS AVAILABLE</dt><dd id="vcount" class="mono"></dd></div>
+    <div><dt>ACCESS LEVEL</dt><dd id="vlevel" class="mono"></dd></div>
+  </dl>
+  <div class="mini big" aria-hidden="true"><i id="vfill"></i></div>
+  <div class="panel">
+    <p class="mono">FRAGMENTS COLLECTED: <b id="vfrags"></b></p>
+    <p id="vhint" class="hint" hidden></p>
+    <label for="vcode" class="mono">ENTER ACCESS CODE</label>
+    <input id="vcode" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="____">
+    <p id="vmsg" class="msg" role="status" aria-live="polite"></p>
+    <button class="btn" id="vgo">OPEN VAULT</button>
+  </div>
+</section>
+
+<section class="screen" id="upload">
+  <h2>EXTRACTION</h2><p class="mono">SEND THE CLASSIFIED PHOTOS</p>
+  <p>The vault is open. Last step: select the photos and send them to <span data-me></span>. 📸</p>
+  <div class="panel">
+    <label class="btn alt" for="ufiles">SELECT PHOTOS</label>
+    <input class="sr" type="file" id="ufiles" accept="image/*" multiple>
+    <ul id="ulist" class="ulist"></ul>
+    <div class="mini"><i id="ubar"></i></div>
+    <p id="umsg" class="msg" role="status" aria-live="polite"></p>
+  </div>
+  <button class="btn" id="usend" hidden>SEND PHOTOS</button>
+  <button class="btn" id="unext" hidden>CONTINUE</button>
+</section>
+
+<section class="screen" id="gallery">
+  <h2>CLASSIFIED MATERIAL UNLOCKED</h2><p class="mono" id="gcount"></p>
+  <div id="grid" class="grid"></div>
+  <div id="locked" class="panel" hidden>
+    <p class="lead">WAIT...<br>YOU THOUGHT THAT WAS EVERYTHING?</p>
+    <p class="mono">THERE ARE STILL <b id="leftn"></b> PHOTOS LOCKED.</p>
+    <h3>FINAL CHALLENGE</h3><p class="mono">ONE LAST EFFORT.</p><p id="fctext"></p>
+    <label for="fcode" class="mono">ENTER THE FINAL CODE</label>
+    <input id="fcode" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="______">
+    <p id="fmsg" class="msg" role="status" aria-live="polite"></p>
+    <button class="btn" id="fgo">COMPLETE FINAL CHALLENGE</button>
+  </div>
+  <button class="btn" id="finish" hidden>FINISH MISSION</button>
+</section>
+
+<section class="screen" id="done">
+  <div class="lock" aria-hidden="true">🏆</div>
+  <h2>MISSION COMPLETE</h2>
+  <p class="lead">ALL CLASSIFIED MATERIAL<br>HAS BEEN ACQUIRED.</p><p>YOU DID IT. 😂</p>
+  <dl class="stats panel">
+    <div><dt>MISSION STATUS</dt><dd class="ok mono">SUCCESS</dd></div>
+    <div><dt>PHOTOS RECOVERED</dt><dd id="dcount" class="mono"></dd></div>
+  </dl>
+  <blockquote id="fmessage" class="panel"></blockquote>
+  <button class="btn" id="dview">VIEW ALL MEMORIES</button>
+</section>
+</main>
+
+<div id="lb" class="lb" role="dialog" aria-modal="true" aria-label="Photo viewer" hidden>
+  <img id="lbimg" alt="">
+  <p id="lbcap" class="mono"></p>
+  <button class="ib lbc" id="lbclose" aria-label="Close">✕</button>
+  <button class="ib lbc" id="lbfs" aria-label="Toggle fullscreen">⛶</button>
+  <button class="ib lbn l" id="lbprev" aria-label="Previous photo">‹</button>
+  <button class="ib lbn r" id="lbnext" aria-label="Next photo">›</button>
+</div>
+<script src="config.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
